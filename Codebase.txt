@@ -1,0 +1,33 @@
+import pandas as pd
+df=pd.read_csv("https://www.google.com/url?q=https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data&ust=1534703940000000&usg=AFQjCNEUvj2z2n-DzM01U13ikUiea40dsA&hl=en",header=None)
+df.rename(columns={3:'Education',5:'Marital_Status',6:'Designation',9:'Gender',13:'Country',0:'Age'},inplace=True)
+dfx=df[['Age','Education','Marital_Status','Designation','Gender','Country']]
+dfx.head(4)
+
+#1
+
+import sqlalchemy
+from sqlalchemy import create_engine
+engine=create_engine('sqlite:///:memory:',echo=True)
+dfx.to_sql("Sample",engine)
+
+
+#2
+
+engine.execute("Update Sample Set Country='NA' where Country=' ?' ")
+engine.execute("Update Sample Set Designation='NA' where Designation=' ?' ")
+
+#3
+
+engine.execute("DELETE FROM Sample Where Age<20")
+engine.execute("DELETE FROM Sample Where Age=90")
+
+#4
+
+engine.execute("SELECT * FROM Sample WHERE AGE=20").fetchone()
+engine.execute("SELECT * FROM Sample WHERE AGE=88").fetchone()
+
+#5
+
+engine.execute("SELECT Age,count(*) FROM Sample Group By Age").fetchmany(5)
+engine.execute("SELECT Gender,count(*) FROM Sample Group By Gender").fetchall()
